@@ -15,4 +15,4 @@ pool
     console.error("Error connecting to the database:", err),
   );
 
-export default pool;
+export default pool;  

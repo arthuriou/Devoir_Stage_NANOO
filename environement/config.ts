@@ -15,7 +15,7 @@ export const config = {
   },
   sendgridApiKey: process.env.SENDGRID_API as string,
   sendgridFrom: process.env.SENDGRID_FROM as string,
-  frontendUrl: process.env.FRONTEND_URL as string,
+  frontendUrl: process.env.FRONTEND_URL as string,
 };
 
 export default config;
