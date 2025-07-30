@@ -21,4 +21,5 @@ export class UserRepository {
     );
     return result.rows[0] || null;
   }
+
 }

@@ -1,13 +1,13 @@
 import pool from "../utils/database";
-import { otp } from '../models/otp';
+import { Otp } from '../models/otp';
 
 export class OtpRepository {
-    static async create(otp: otp): Promise<otp> {
+    static async create(email: string, code: string, expires_at: Date): Promise<Otp> {
         const result = await pool.query(
-            `INSERT INTO otp (user_id, code, expires_at, used)
-             VALUES ($1, $2, $3, $4)
-             RETURNING id, user_id, code, expires_at, used`,
-            [otp.user_id, otp.code, otp.expires_at, otp.used]
+            `INSERT INTO otps (email, code, expires_at, used)
+             VALUES ($1, $2, $3, false) 
+             RETURNING *`,
+            [email, code, expires_at]
         );
         return result.rows[0];
     }
