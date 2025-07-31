@@ -1,5 +1,4 @@
-import { sendOtpEmail } from './mailService';
-import { OtpRepository } from '../repositories/otpRepositories';
+import { OtpRepository } from "../repositories/otpRepositories";
 
 
 export const generateOTP = (): string => {
@@ -9,8 +8,17 @@ export const generateOTP = (): string => {
   
 export const createOTP = async (): Promise<any> => {
   const code = generateOTP();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
   
-  return {code, expiresAt};
+  return {code, expires_at};
 };
-  
+
+export const verifyOTP = async ( email: string, code: string): Promise<boolean> => {
+  const otpEntry = await OtpRepository.findByEmail(email);
+  if (!otpEntry) throw new Error("OTP introuvable");
+  if (new Date() > otpEntry.expires_at) throw new Error("OTP expiré");
+  if (otpEntry.code !== code) throw new Error("OTP incorrect");
+  await OtpRepository.deleteMany(email);
+  return true;
+};
+

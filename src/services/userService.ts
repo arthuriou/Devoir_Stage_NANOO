@@ -1,9 +1,10 @@
 import { UserRepository } from '../repositories/userRepository';
 import { User } from '../models/user';
 import { hashPassword } from '../utils/hashUtils';
-import { createOTP } from '../utils/otpService';
+import { createOTP} from '../utils/otpService';
 import { sendOtpEmail } from '../utils/mailService';
 import { OtpRepository } from '../repositories/otpRepositories';
+
 
 
 export class UserService {
@@ -19,17 +20,35 @@ export class UserService {
       ...userData,  
       password: hashedPassword,
       createdAt: new Date(),
+      verified: false,
     });
 
-
-     const {code, expiresAt} =  await createOTP();
+    const { code, expires_at} =  await createOTP();
      
+    await OtpRepository.create(newUser.email ,code, expires_at);
 
-  await OtpRepository.create(newUser.email, code, expiresAt);
-  
   await sendOtpEmail(newUser.email, code);
-
+  
     return newUser;
   }
+
+
+ static async verifyEmail(email: string, code: string): Promise<boolean> {
+    // 1. Récupérer le dernier OTP non expiré
+    const otp = await OtpRepository.findValidOTP(email);
+
+    if (!otp) return false;
+    if (otp.code !== code) return false;
+
+    // 2. Marquer l’OTP comme utilisé
+    await OtpRepository.markAsUsed(otp.id!);
+    
+
+    // 3. Mettre à jour l'utilisateur : is_verified = true
+    await UserRepository.verifyEmail(email);
+
+    return true;
+  }
+
 
 }

@@ -20,8 +20,7 @@ app.get('/healthCheck', (req:Request , res:Response) =>{
         uptime: process.uptime(), 
     });
 })
-app.use('/api/users', userRoutes);
-
+app.use('/api/auth', userRoutes);
 app.listen(PORT, () => {
     console.log('le serveur est lancé sur le port : '+API_URL);
 }

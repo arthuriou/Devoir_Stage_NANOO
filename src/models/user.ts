@@ -5,4 +5,5 @@ email:string;
 bio?:string;
 password:string;
 createdAt:Date;
+verified?:boolean;
 }

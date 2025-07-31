@@ -16,9 +16,14 @@ export const sendOtpEmail = async (to: string, otp: string) => {
       from: `"Arthuriousk" <${process.env.MAIL_USER}>`,
       to,
       subject: 'Code de vérification',
-      text: `Voici votre code OTP :  ${otp} . Il expire dans 10 minutes.`,
+       html:`
+       <p>Voici votre code OTP : </p>
+       <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-radius: 3px; font-size: 24px; letter-spacing: 5px; margin: 20px 0;">
+       <strong>${otp}</strong>
+       </div> 
+       <p>Il expire dans 10 minutes :) .</p>
+       `
     };
-
     await transporter.sendMail(mailOptions);
   } catch (error) {
     console.error('Erreur en envoyant l’email OTP:', error);
