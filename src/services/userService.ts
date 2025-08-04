@@ -4,7 +4,7 @@ import { hashPassword } from '../utils/hashUtils';
 import { createOTP} from '../utils/otpService';
 import { sendOtpEmail } from '../utils/mailService';
 import { OtpRepository } from '../repositories/otpRepositories';
-
+import { comparePassword } from '../utils/hashUtils';
 
 
 export class UserService {
@@ -25,17 +25,29 @@ export class UserService {
 
     const { code, expires_at} =  await createOTP();
      
-    await OtpRepository.create(newUser.email ,code, expires_at);
+    await OtpRepository.create(newUser.email ,code, expires_at , 'email_verification');
 
   await sendOtpEmail(newUser.email, code);
   
     return newUser;
   }
 
+  static async login(email: string, password: any): Promise<User> {
+    const user = await UserRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Email non trouvé');
+    }
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Mot de passe incorrect');
+    }
+    return user;
+  }
+
 
  static async verifyEmail(email: string, code: string): Promise<boolean> {
     // 1. Récupérer le dernier OTP non expiré
-    const otp = await OtpRepository.findValidOTP(email);
+    const otp = await OtpRepository.findValidOTP(email , 'email_verification');
 
     if (!otp) return false;
     if (otp.code !== code) return false;
@@ -50,5 +62,36 @@ export class UserService {
     return true;
   }
 
+  static async sendPasswordResetOTP(email: string): Promise<void> {
+    const { code, expires_at } = await createOTP(); 
+  
+    // Supprimer les anciens OTP pour cet email et ce type
+    await OtpRepository.deleteMany(email , 'password_reset');
+  
+    // Créer et sauvegarder un nouveau OTP
+    await OtpRepository.create(email ,code, expires_at , 'password_reset');
+  
+    // Envoyer l'email
+    await sendOtpEmail(email, code);
+  }
+  
+  static async resetPassword(email: string, code: string, password: string): Promise<void> {
+    const user = await UserRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Email non trouvé');
+    }
+   
+    const otp = await OtpRepository.findValidOTP(email , 'password_reset');
+    if (!otp )
+       throw new Error('OTP invalide ou expiré');
+    if (otp.code !== code) 
+      throw new Error('OTP invalide ou expiré');
+
+    await OtpRepository.markAsUsed(otp.id!);
+    const hashedPassword = await hashPassword(password);
+    
+    await UserRepository.updatePassword(email, hashedPassword);
+    
+  }
 
 }

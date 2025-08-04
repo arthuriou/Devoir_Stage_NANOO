@@ -27,6 +27,13 @@ export class UserRepository {
       [email]
     );
   }
+  static async updatePassword(email: string, password: string): Promise<void> {
+    await pool.query(
+      `UPDATE users SET password = $2 WHERE email = $1`,
+      [email, password]
+    );
+
+  }
 
   // static async findByEmail(email: string): Promise<User | null> {
   //   const result = await pool.query(
