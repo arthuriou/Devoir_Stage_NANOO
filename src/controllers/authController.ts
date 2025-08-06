@@ -2,16 +2,19 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { HTTP_STATUS, RESPONSE_MESSAGE } from '../utils/error_message';
 import { UserRepository } from '../repositories/userRepository';
-
+import { generateToken } from '../utils/jwtutils';
 
 export class AuthController {
 
   static async register(req: Request, res: Response) {
     try {
       const user = await UserService.register(req.body);
+      const token = generateToken({ id: user.id, email: user.email });
+
       res.status(HTTP_STATUS.CREATED).json(
         { success: true,
           message: "Utilisateur créé avec succès , veuillez vérifier votre email pour activer votre compte",
+          token,
           user : {
             id: user.id,
             email: user.email,
@@ -25,7 +28,7 @@ export class AuthController {
     } catch (error: any) {
       res.status(HTTP_STATUS.BAD_REQUEST).json(
         { success: false, 
-          message: error.message || RESPONSE_MESSAGE.BAD_REQUEST 
+          message: RESPONSE_MESSAGE.BAD_REQUEST 
         });
     }
   }
@@ -34,9 +37,11 @@ export class AuthController {
     try {
       const { email, password } = req.body;
       const user = await UserService.login(email , password);
-      res.status(HTTP_STATUS.OK).json({
+      const token = generateToken({ id: user.id, email: user.email });
+      res.status(HTTP_STATUS.OK).json({ 
         success: true,
-        message: "Connexion réussie",
+        message: RESPONSE_MESSAGE.OK,
+        token,
         user: {
           id: user.id,
           email: user.email,
@@ -141,6 +146,24 @@ export class AuthController {
         });
     }
   }
+
+  static async resendEmailVerificationOTP(req:Request , res:Response){
+    await UserService.resendEmailVerificationOTP(req.body.email);
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Un  nouveau code a été envoyé à votre email pour vérifier votre compte",
+      });
+  }
+
+  static async resendResetPasswordOTP(req:Request , res:Response){
+    await UserService.resendResetPasswordOTP(req.body.email);
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Un  nouveau code a été envoyé à votre email pour réinitialiser votre mot de passe",
+      });
+  }
+
+
 
 }
 

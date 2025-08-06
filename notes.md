@@ -30,3 +30,21 @@ Ainsi, ton application sera plus légère et plus sécurisée en production, car
 -------------------------------------------------------------------------
 ## Nodemon
 Nodemon est un outil qui surveille automatiquement les fichiers de votre projet Node.js et redémarre le serveur à chaque modification détectée. Cela permet de gagner du temps lors du développement, car vous n’avez pas besoin de relancer manuellement votre application après chaque changement de code. Il est très utilisé avec Express et TypeScript (via ts-node) pour un workflow de développement fluide.
+
+## AuthMiddleware
+
+Un middleware est une fonction qui reçoit les objets request et response, et le callback de la chaîne. Cela permet de traiter les requêtes avant de les envoyer au routeur.
+
+Exemple d'utilisation pour vérifier si un utilisateur est authentifié avant d'accéder à une route protégée :
+
+import { authenticate } from '../middlewares/authMiddleware';
+
+router.get('/profile', authenticate, async (req, res) => {
+  const user = (req as any).user;
+  res.json({ success: true, message: "Bienvenue", user });
+});
+
+
+## npx tsc : Pour build le projet , tout ce qui se trouve dans le src est transformé en js et stocké dans le dist
+
+npx tsc

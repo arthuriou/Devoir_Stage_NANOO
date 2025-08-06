@@ -94,4 +94,20 @@ export class UserService {
     
   }
 
+
+static async resendEmailVerificationOTP(email: string): Promise<void> {
+    await OtpRepository.deleteMany(email , 'email_verification');
+    const { code, expires_at } = await createOTP();
+    await  OtpRepository.create(email, code, expires_at, 'email_verification');
+    await sendOtpEmail(email , code);
+  }
+
+  static async resendResetPasswordOTP(email: string): Promise<void> {
+    await OtpRepository.deleteMany(email , 'password_reset');
+    const { code, expires_at } = await createOTP();
+    await  OtpRepository.create(email, code, expires_at, 'password_reset');
+    await sendOtpEmail(email , code);
+  }
+
+
 }
