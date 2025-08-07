@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { HTTP_STATUS, RESPONSE_MESSAGE } from '../utils/error_message';
 import { UserRepository } from '../repositories/userRepository';
@@ -9,53 +9,25 @@ export class AuthController {
   static async register(req: Request, res: Response) {
     try {
       const user = await UserService.register(req.body);
-      const token = generateToken({ id: user.id, email: user.email });
-
       res.status(HTTP_STATUS.CREATED).json(
         { success: true,
           message: "Utilisateur créé avec succès , veuillez vérifier votre email pour activer votre compte",
-          token,
           user : {
             id: user.id,
             email: user.email,
             username: user.username,
             bio: user.bio,
-            createdAt: user.createdAt,
+            prifile_picture: user.profile_picture,
+            createdAt: user.created_at,
             verified: user.verified,
           }
-
         });
     } catch (error: any) {
+      console.log(error);
       res.status(HTTP_STATUS.BAD_REQUEST).json(
         { success: false, 
           message: RESPONSE_MESSAGE.BAD_REQUEST 
         });
-    }
-  }
-
- static async login(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
-      const user = await UserService.login(email , password);
-      const token = generateToken({ id: user.id, email: user.email });
-      res.status(HTTP_STATUS.OK).json({ 
-        success: true,
-        message: RESPONSE_MESSAGE.OK,
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          bio: user.bio,
-          createdAt: user.createdAt,
-          verified: user.verified,
-        },
-      });
-    } catch (error: any) {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        success: false,
-        message: error.message || RESPONSE_MESSAGE.BAD_REQUEST,
-      });
     }
   }
 
@@ -90,6 +62,36 @@ export class AuthController {
         success: false,
         message: "Erreur serveur",
       });
+    }
+  }
+  
+ static async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      const user = await UserService.login(email , password);
+      const token = generateToken({ id: user.id, email: user.email });
+      res.status(HTTP_STATUS.OK).json({ 
+        success: true,
+        message: RESPONSE_MESSAGE.OK,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          bio: user.bio,
+          createdAt: user.created_at,
+          verified: user.verified,
+          is_active: user.is_active,
+        },
+      });
+    } catch (error: any) {
+      console.log(error)
+      res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: error.message || RESPONSE_MESSAGE.BAD_REQUEST,
+        
+      })
+      
     }
   }
 
@@ -163,7 +165,25 @@ export class AuthController {
       });
   }
 
+  static async updateUserProfile(req:Request , res:Response){
+    try {
+      const ProfileData = req.body;
+      const userId = (req as any).user.id;
 
+      await UserService.updateUserProfile(userId, ProfileData);
+      return res.status(HTTP_STATUS.OK).json({
+        success: true,
+        message: "Profil mis à jour avec succès",
+      });
+      
+    } catch (error) {
+      console.error("Erreur mise à jour du profile :", error);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Erreur serveur",
+      });
+    }
+  }
 
 }
 

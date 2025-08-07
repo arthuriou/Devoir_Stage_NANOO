@@ -19,7 +19,7 @@ export class UserService {
     const newUser: User =  await UserRepository.create({
       ...userData,  
       password: hashedPassword,
-      createdAt: new Date(),
+      created_at: new Date(),
       verified: false,
     });
 
@@ -41,6 +41,7 @@ export class UserService {
     if (!isPasswordValid) {
       throw new Error('Mot de passe incorrect');
     }
+    await UserRepository.setActiveStatus(user.id!, true);
     return user;
   }
 
@@ -109,5 +110,12 @@ static async resendEmailVerificationOTP(email: string): Promise<void> {
     await sendOtpEmail(email , code);
   }
 
+  static async updateUserProfile(id : string , ProfileData : Partial<User>) : Promise<void> {
+    await UserRepository.updateUserProfile(id , ProfileData);
+  }
 
+  static async userIsActive(id : string , isActive : boolean) :Promise<Boolean> {
+    await UserRepository.setActiveStatus(id , isActive);
+    return true;
+  }
 }

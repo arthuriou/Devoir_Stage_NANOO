@@ -2,7 +2,8 @@ import express from 'express';
 import { Request, Response } from 'express';
 import { HTTP_STATUS, RESPONSE_MESSAGE } from './utils/error_message';
 import userRoutes from './routes/userRoute';
-import noteRoutes from './routes/noteRoutes'
+import noteRoutes from './routes/noteRoute'
+import postRoutes from './routes/postRoute';
 const app = express();
 app.use(express.json());
 
@@ -23,6 +24,8 @@ app.get('/healthCheck', (req:Request , res:Response) =>{
 })
 app.use('/api/auth', userRoutes);
 app.use('/api/notes', noteRoutes);
+app.use('/api/posts', postRoutes);
+
 app.listen(PORT, () => {
     console.log('le serveur est lancé sur le port : '+API_URL);
 }
