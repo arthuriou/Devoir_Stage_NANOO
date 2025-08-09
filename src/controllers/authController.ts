@@ -184,6 +184,37 @@ export class AuthController {
       });
     }
   }
+  static async getUser(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id;
+      const user = await UserRepository.findById(userId);
+      if (!user) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+          success: false,
+          message: "Utilisateur non trouvé",
+        });
+      }
+      return res.status(HTTP_STATUS.OK).json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          bio: user.bio,
+          profile_picture: user.profile_picture,
+          created_at: user.created_at,
+          verified: user.verified,
+          is_active: user.is_active,
+        },
+      });
+    } catch (error) {
+      console.error("Erreur récupération utilisateur:", error);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Erreur serveur",
+      });
+    }
+  }
 
 }
 

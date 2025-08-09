@@ -118,4 +118,11 @@ static async resendEmailVerificationOTP(email: string): Promise<void> {
     await UserRepository.setActiveStatus(id , isActive);
     return true;
   }
+  static async getUserById(id : string) : Promise<User> {
+    const user = await UserRepository.findById(id);
+    if (!user) {
+      throw new Error("Utilisateur non trouvé.");
+    }
+    return user;
+  }
 }
