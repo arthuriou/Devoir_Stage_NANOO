@@ -32,6 +32,7 @@ export class UserService {
     return newUser;
   }
 
+
   static async login(email: string, password: any): Promise<User> {
     const user = await UserRepository.findByEmail(email);
     if (!user) {

@@ -1,5 +1,5 @@
 import express from "express";
-import { NoteController } from "../controllers/noteControllers";
+import { NoteController } from "../controllers/noteController";
 import { authenticate } from "../middlewares/authMiddleware";
 
 

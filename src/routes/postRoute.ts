@@ -1,5 +1,5 @@
 import express from 'express';
-import { PostController } from '../controllers/postControllers';
+import { PostController } from '../controllers/postController';
 import { authenticate } from '../middlewares/authMiddleware';
 
 const router = express.Router();
