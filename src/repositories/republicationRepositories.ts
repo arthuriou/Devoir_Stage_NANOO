@@ -12,4 +12,20 @@ export class RepublicationRepository {
         );
         return result.rows[0];
     }
+
+    static async findById(id: string): Promise<Republication | null> {
+        const result = await pool.query(
+            `SELECT * FROM republications WHERE id = $1`,
+            [id]
+        );
+        return result.rows[0] || null;
+    }
+
+    static async getRepublicationsByUserId(userId: string): Promise<Republication[]> {
+        const result = await pool.query(
+            `SELECT * FROM republications WHERE user_id = $1 ORDER BY created_at DESC`,
+            [userId]
+        );
+        return result.rows;
+    }
 }

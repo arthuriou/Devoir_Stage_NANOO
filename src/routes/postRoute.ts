@@ -8,5 +8,5 @@ router.post('/create-post', authenticate, PostController.createPost);
 router.patch('/edit-post/:id', authenticate, PostController.editPost);
 router.delete('/delete-post/:id', authenticate, PostController.deletePost);
 router.get('/get-post/:id', authenticate, PostController.getPostById);
-
+router.get('/get-posts/:user_id', authenticate, PostController.getAllPosts);
 export default router;

@@ -3,8 +3,6 @@ import { Request, Response } from 'express';
 import { HTTP_STATUS } from '../utils/error_message';
 
 
-
-
 export class RepublicationController {
     static async createRepublication(req: Request, res: Response) {
         try {
@@ -36,5 +34,39 @@ export class RepublicationController {
                 message: "Erreur lors de la création de la republication",
             });
         }
+    }
+
+    static async getRepublicationById(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const republication = await RepublicationService.getRepublicationById(id);
+            return res.status(HTTP_STATUS.OK).json({
+                success: true,
+                republication,
+            });
+          } catch(error){
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "Erreur lors de la récupération de la republication",
+            });
+          }
+    }
+
+    static async getAllRepublications(req: Request, res: Response) {
+        try {
+            const { user_id} = req.params;
+            const republication = await RepublicationService.getRepublicationsByUserId(user_id);
+            return res.status(HTTP_STATUS.OK).json({
+                success: true,
+                republication,
+            });
+          } catch(error){
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "Erreur lors de la récupération des republications",
+            });
+          }
     }
 }

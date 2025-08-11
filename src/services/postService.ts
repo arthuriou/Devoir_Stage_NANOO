@@ -44,6 +44,14 @@ export class PostService {
         }
         return posts;
     }
+
+    static async getAllPosts(user_id:string) : Promise<Post[]> {
+        const posts = await PostRepository.getPostsByUserId(user_id);
+        if (!posts || posts.length === 0) {
+            throw new Error("Aucun post trouvé pour cet utilisateur.");
+        }
+        return posts;
+    }
 }
 
 

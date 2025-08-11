@@ -95,4 +95,21 @@ try {
   }
  }
 
+  static async getAllPosts(req: Request, res: Response) {
+  try {
+    const { user_id } = req.params;
+    const post = await PostService.getAllPosts(user_id);
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Tout les posts récupéré avec succès",
+      post,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Erreur lors de la récupération des posts",
+    });
+  }
+ }
 }
