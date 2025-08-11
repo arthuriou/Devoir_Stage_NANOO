@@ -1,33 +1,32 @@
-import e, { Request, Response } from 'express';
-import { UserService } from '../services/userService';
-import { HTTP_STATUS, RESPONSE_MESSAGE } from '../utils/error_message';
-import { UserRepository } from '../repositories/userRepository';
-import { generateToken } from '../utils/jwtutils';
+import e, { Request, Response } from "express";
+import { UserService } from "../services/userService";
+import { HTTP_STATUS, RESPONSE_MESSAGE } from "../utils/error_message";
+import { UserRepository } from "../repositories/userRepository";
+import { generateToken } from "../utils/jwtutils";
 
 export class AuthController {
-
   static async register(req: Request, res: Response) {
     try {
       const user = await UserService.register(req.body);
-      res.status(HTTP_STATUS.CREATED).json(
-        { success: true,
-          message: "Utilisateur créé avec succès , veuillez vérifier votre email pour activer votre compte",
-          user : {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            bio: user.bio,
-            prifile_picture: user.profile_picture,
-            createdAt: user.created_at,
-            verified: user.verified,
-          }
-        });
+      res.status(HTTP_STATUS.CREATED).json({
+        success: true,
+        message:
+          "Utilisateur créé avec succès , veuillez vérifier votre email pour activer votre compte",
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          bio: user.bio,
+          prifile_picture: user.profile_picture,
+          createdAt: user.created_at,
+          verified: user.verified,
+        },
+      });
     } catch (error: any) {
       console.log(error);
-      res.status(HTTP_STATUS.BAD_REQUEST).json(
-        { success: false, 
-          message: RESPONSE_MESSAGE.BAD_REQUEST 
-        });
+      res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ success: false, message: RESPONSE_MESSAGE.BAD_REQUEST });
     }
   }
 
@@ -55,7 +54,6 @@ export class AuthController {
         success: true,
         message: "Email vérifié avec succès",
       });
-
     } catch (error) {
       console.error("Erreur vérification email:", error);
       return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
@@ -64,13 +62,13 @@ export class AuthController {
       });
     }
   }
-  
- static async login(req: Request, res: Response) {
+
+  static async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-      const user = await UserService.login(email , password);
+      const user = await UserService.login(email, password);
       const token = generateToken({ id: user.id, email: user.email });
-      res.status(HTTP_STATUS.OK).json({ 
+      res.status(HTTP_STATUS.OK).json({
         success: true,
         message: RESPONSE_MESSAGE.OK,
         token,
@@ -85,19 +83,17 @@ export class AuthController {
         },
       });
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: error.message || RESPONSE_MESSAGE.BAD_REQUEST,
-        
-      })
-      
+      });
     }
   }
 
-  static async forgotPassword(req:Request , res:Response){
+  static async forgotPassword(req: Request, res: Response) {
     try {
-      const {email} = req.body;
+      const { email } = req.body;
       const users = await UserRepository.findByEmail(email);
       if (!users) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -110,21 +106,21 @@ export class AuthController {
 
       return res.status(HTTP_STATUS.OK).json({
         success: true,
-        message: "Un code a été envoyé à votre email pour réinitialiser votre mot de passe",
-        });
-      } 
-      catch (error) {
-        console.error("Erreur forgotPassword:", error);
-        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-          success: false,
-          message: "Erreur serveur",
-        });
+        message:
+          "Un code a été envoyé à votre email pour réinitialiser votre mot de passe",
+      });
+    } catch (error) {
+      console.error("Erreur forgotPassword:", error);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Erreur serveur",
+      });
     }
   }
 
-  static async resetPassword(req:Request , res:Response){
+  static async resetPassword(req: Request, res: Response) {
     try {
-      const {email , code , password} = req.body;
+      const { email, code, password } = req.body;
       const users = await UserRepository.findByEmail(email);
       if (!users) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -133,39 +129,40 @@ export class AuthController {
         });
       }
 
-      await UserService.resetPassword(email , code , password);
+      await UserService.resetPassword(email, code, password);
 
       return res.status(HTTP_STATUS.OK).json({
         success: true,
         message: "Mot de passe réinitialisé avec succès",
-        });
-      } 
-      catch (error) {
-        console.error("Erreur resetPassword:", error);
-        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-          success: false,
-          message: "Erreur serveur",
-        });
+      });
+    } catch (error) {
+      console.error("Erreur resetPassword:", error);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Erreur serveur",
+      });
     }
   }
 
-  static async resendEmailVerificationOTP(req:Request , res:Response){
+  static async resendEmailVerificationOTP(req: Request, res: Response) {
     await UserService.resendEmailVerificationOTP(req.body.email);
     return res.status(HTTP_STATUS.OK).json({
       success: true,
-      message: "Un  nouveau code a été envoyé à votre email pour vérifier votre compte",
-      });
+      message:
+        "Un  nouveau code a été envoyé à votre email pour vérifier votre compte",
+    });
   }
 
-  static async resendResetPasswordOTP(req:Request , res:Response){
+  static async resendResetPasswordOTP(req: Request, res: Response) {
     await UserService.resendResetPasswordOTP(req.body.email);
     return res.status(HTTP_STATUS.OK).json({
       success: true,
-      message: "Un  nouveau code a été envoyé à votre email pour réinitialiser votre mot de passe",
-      });
+      message:
+        "Un  nouveau code a été envoyé à votre email pour réinitialiser votre mot de passe",
+    });
   }
 
-  static async updateUserProfile(req:Request , res:Response){
+  static async updateUserProfile(req: Request, res: Response) {
     try {
       const ProfileData = req.body;
       const userId = (req as any).user.id;
@@ -175,7 +172,6 @@ export class AuthController {
         success: true,
         message: "Profil mis à jour avec succès",
       });
-      
     } catch (error) {
       console.error("Erreur mise à jour du profile :", error);
       return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
@@ -215,6 +211,4 @@ export class AuthController {
       });
     }
   }
-
 }
-

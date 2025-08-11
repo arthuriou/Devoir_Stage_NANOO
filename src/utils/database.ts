@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import dotenv from "dotenv";
-import {config} from "../../environement/config"
+import { config } from "../../environement/config";
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ pool
   .connect()
   .then(() => console.log("Connected to PostgreSQL database"))
   .catch((err: Error) =>
-    console.error("Error connecting to the database:", err),
+    console.error("Error connecting to the database:", err)
   );
 
-export default pool;  
+export default pool;

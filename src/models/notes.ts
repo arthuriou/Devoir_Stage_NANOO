@@ -1,4 +1,4 @@
-export interface Notes{
- id: string;
- texte:string;
+export interface Notes {
+  id: string;
+  texte: string;
 }
