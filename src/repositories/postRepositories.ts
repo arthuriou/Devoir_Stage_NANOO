@@ -21,11 +21,12 @@ export class PostRepository {
   static async editPost(
     id: string,
     content: string,
-    image_url?: string
+    image_url?: string,
+    update_at?: Date
   ): Promise<Post | null> {
     const result = await pool.query(
-      `UPDATE posts SET content = $2, image_url = $3 WHERE id = $1 RETURNING *`,
-      [id, content, image_url]
+      `UPDATE posts SET content = $2, image_url = $3 , updated_at = $4 WHERE id = $1 RETURNING *`,
+      [id, content, image_url , update_at]
     );
     return result.rows[0] || null;
   }
@@ -34,10 +35,14 @@ export class PostRepository {
     await pool.query("DELETE FROM posts WHERE id = $1", [id]);
   }
 
-  static async getPostsByUserId(userId: string): Promise<Post[]> {
+  static async getPostsByUserId(userId: string): Promise<any[]> {
     const result = await pool.query(
-      "SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC",
-      [userId]
+        `SELECT posts.*, users.username
+         FROM posts
+         JOIN users ON posts.user_id = users.id
+         WHERE posts.user_id = $1
+         ORDER BY posts.created_at DESC`,
+        [userId]
     );
     return result.rows;
   }

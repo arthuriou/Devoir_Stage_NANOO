@@ -34,7 +34,7 @@ export class PostController {
     try {
       const { id } = req.params;
       const { content, image_url } = req.body;
-      const userId = (req as any).user.id;
+     
 
       if (!content || content.trim() === "") {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -43,7 +43,7 @@ export class PostController {
         });
       }
 
-      const updatedPost = await PostService.editPost(id, content, image_url);
+      const updatedPost = await PostService.editPost(id, content, image_url , new Date());
       return res.status(HTTP_STATUS.OK).json({
         success: true,
         message: "Post mis à jour avec succès",

@@ -24,12 +24,13 @@ export class PostService {
   static async editPost(
     id: string,
     content: string,
-    image_url?: string
+    image_url?: string,
+    update_at?: Date
   ): Promise<Post | null> {
     if (!content || content.trim() === "") {
       throw new Error("Le contenu ne peut etre vide.");
     }
-    const updatedPost = await PostRepository.editPost(id, content, image_url);
+    const updatedPost = await PostRepository.editPost(id, content, image_url , update_at);
     if (!updatedPost) {
       throw new Error("Post non trouvé ou mise à jour échouée.");
     }
