@@ -30,7 +30,7 @@ export class OtpRepository {
     return result.rows[0] || null;
   }
 
-  // Marquer un OTP comme utilisé
+  
   static async markAsUsed(id: string): Promise<void> {
     await pool.query(`UPDATE otps SET used = TRUE WHERE id = $1`, [id]);
   }

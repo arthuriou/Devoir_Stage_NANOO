@@ -24,13 +24,13 @@ export class RepublicationRepository {
   static async getRepublicationsByUserId(
     userId: string
   ): Promise<Republication[]> {
-     const result = await pool.query(
-        `SELECT republications.*, users.username
+    const result = await pool.query(
+      `SELECT republications.*, users.username
          FROM republications
          JOIN users ON republications.user_id = users.id
          WHERE republications.user_id = $1
          ORDER BY republications.created_at DESC`,
-        [userId]
+      [userId]
     );
     return result.rows;
   }

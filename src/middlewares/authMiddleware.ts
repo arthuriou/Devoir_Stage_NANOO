@@ -28,24 +28,3 @@ export const authenticate = (
   next();
 };
 
-export const authorize = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res
-      .status(HTTP_STATUS.BAD_REQUEST)
-      .json({ success: false, message: "Token manquant ou invalide" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decoded = verifyToken(token);
-
-  if (!decoded) {
-    return res
-      .status(HTTP_STATUS.UNAUTHORIZED)
-      .json({ success: false, message: "Token invalide ou expiré" });
-  }
-
-  (req as any).user = decoded;
-  next();
-};

@@ -6,10 +6,11 @@ import noteRoutes from "./routes/noteRoute";
 import postRoutes from "./routes/postRoute";
 import commentRoutes from "./routes/commentRoute";
 import republicationRoutes from "./routes/republicationRoute";
+import likeRoutes from "./routes/likeRoute";
 const app = express();
 app.use(express.json());
 
-const PORT = 3000;
+const PORT =  process.env.PORT|| 3000;
 const API_URL = "http://localhost:3000";
 
 app.get("/", (req: Request, res: Response) => {
@@ -29,7 +30,10 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/republications", republicationRoutes);
+app.use("/api/likes", likeRoutes);
 
 app.listen(PORT, () => {
   console.log("le serveur est lancé sur le port : " + API_URL);
 });
+
+
